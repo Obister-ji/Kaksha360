@@ -1,0 +1,50 @@
+/* Fix for time picker dropdown issues */
+.popover-content {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+.select-content {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+.select-item {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.select-trigger {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.select-value {
+  pointer-events: auto !important;
+}
+
+/* Ensure the popover doesn't get hidden */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for calendar */
+.rdp {
+  pointer-events: auto !important;
+}
+
+.rdp-button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Fix for select dropdown */
+[role="listbox"] {
+  pointer-events: auto !important;
+}
+
+[role="option"] {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
