@@ -455,7 +455,7 @@ const AnnouncementsContent = ({ userRole }: AnnouncementsContentProps) => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsViewDialogOpen(false)}
-                  className="h-8 w-8 rounded-full"
+                  className="h-8 w-8 rounded-full border border-gray-200 hover:bg-gray-100"
                 >
                   <X className="h-4 w-4" />
                   <VisuallyHidden>Close</VisuallyHidden>
