@@ -70,14 +70,7 @@ const TestSolution = () => {
     correctAnswers: 0,
     incorrectAnswers: 0,
     unattemptedQuestions: 0,
-    subjectPerformance: {
-      "1": { correct: 0, total: 0 }, // General Intelligence & Reasoning
-      "2": { correct: 0, total: 0 }, // General Awareness
-      "3": { correct: 0, total: 0 }, // Quantitative Aptitude
-      "4": { correct: 0, total: 0 }, // English Comprehension
-      "5": { correct: 0, total: 0 }, // Quantitative Aptitude & Reasoning
-      "6": { correct: 0, total: 0 }  // General Awareness & English Comprehension
-    }
+    subjectPerformance: {} // Will be populated based on actual questions
   });
 
   useEffect(() => {
@@ -195,15 +188,8 @@ const TestSolution = () => {
     let incorrectCount = 0;
     let unattemptedCount = 0;
 
-    // Initialize with default subjects and allow for dynamic subjects
-    const subjectPerformance: Record<string, { correct: number, total: number }> = {
-      "1": { correct: 0, total: 0 }, // General Intelligence & Reasoning
-      "2": { correct: 0, total: 0 }, // General Awareness
-      "3": { correct: 0, total: 0 }, // Quantitative Aptitude
-      "4": { correct: 0, total: 0 }, // English Comprehension
-      "5": { correct: 0, total: 0 }, // Quantitative Aptitude & Reasoning
-      "6": { correct: 0, total: 0 }  // General Awareness & English Comprehension
-    };
+    // Initialize an empty object for subject performance - will be populated based on actual questions
+    const subjectPerformance: Record<string, { correct: number, total: number }> = {};
 
     questions.forEach((question, index) => {
       // Update subject totals
@@ -263,15 +249,8 @@ const TestSolution = () => {
     let incorrectCount = 0;
     let unattemptedCount = 0;
 
-    // Initialize with default subjects and allow for dynamic subjects
-    const subjectPerformance: Record<string, { correct: number, total: number }> = {
-      "1": { correct: 0, total: 0 }, // General Intelligence & Reasoning
-      "2": { correct: 0, total: 0 }, // General Awareness
-      "3": { correct: 0, total: 0 }, // Quantitative Aptitude
-      "4": { correct: 0, total: 0 }, // English Comprehension
-      "5": { correct: 0, total: 0 }, // Quantitative Aptitude & Reasoning
-      "6": { correct: 0, total: 0 }  // General Awareness & English Comprehension
-    };
+    // Initialize an empty object for subject performance - will be populated based on actual questions
+    const subjectPerformance: Record<string, { correct: number, total: number }> = {};
 
     questions.forEach((question, index) => {
       // Update subject totals
@@ -503,8 +482,10 @@ const TestSolution = () => {
             <div className="col-span-1 md:col-span-2">
               <h3 className="text-lg font-semibold mb-3">Subject-wise Performance</h3>
               <div className="space-y-4">
-                {/* Dynamically render all subjects */}
-                {Object.entries(testResults.subjectPerformance).map(([subjectId, performance]) => (
+                {/* Dynamically render only subjects that have questions */}
+                {Object.entries(testResults.subjectPerformance)
+                  .filter(([_, performance]) => performance.total > 0) // Only show subjects with questions
+                  .map(([subjectId, performance]) => (
                   <div key={subjectId}>
                     <div className="flex justify-between mb-1">
                       <span className="text-sm font-medium">

@@ -1189,38 +1189,50 @@ const TakeTest = () => {
         <footer className="flex justify-between mt-8 gap-1 px-1 sm:gap-2 sm:px-2">
           <Button
             id="prev-btn"
-            className="w-[31%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
+            className="w-[23%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
             onClick={handlePrevQuestion}
             disabled={currentQuestion === 1}
             style={{
               backgroundColor: currentQuestion === 1 ? '#d4ddf7' : '#3664ef',
               height: '48px',
-              maxWidth: '340px'
+              maxWidth: '250px'
             }}
           >
             Previous
           </Button>
           <Button
+            id="clear-option-btn"
+            className="w-[23%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
+            onClick={handleClearSelection}
+            style={{
+              backgroundColor: '#3664ef',
+              height: '48px',
+              maxWidth: '250px'
+            }}
+          >
+            Clear Option
+          </Button>
+          <Button
             id="mark-review-btn"
-            className="w-[31%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
+            className="w-[23%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
             onClick={handleMarkReview}
             style={{
               backgroundColor: '#3664ef',
               height: '48px',
-              maxWidth: '340px'
+              maxWidth: '250px'
             }}
           >
             Mark Review
           </Button>
           <Button
             id="next-btn"
-            className="w-[31%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
+            className="w-[23%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
             onClick={handleNextQuestion}
             disabled={currentQuestion === filteredQuestions.length}
             style={{
               backgroundColor: currentQuestion === filteredQuestions.length ? '#d4ddf7' : '#3664ef',
               height: '48px',
-              maxWidth: '340px'
+              maxWidth: '250px'
             }}
           >
             Save & Next
