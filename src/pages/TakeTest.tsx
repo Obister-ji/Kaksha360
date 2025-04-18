@@ -1144,6 +1144,17 @@ const TakeTest = () => {
 
         <section className="mb-6">
           <div className="flex flex-col">
+            {/* Section Info */}
+            <div className="flex justify-between items-center p-3 bg-blue-50 border-b border-blue-200">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-blue-500 mr-1"></div>
+                <span className="font-medium text-blue-800">SECTIONS</span>
+              </div>
+              <div className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">
+                {availableSubjects.length} {availableSubjects.length === 1 ? 'Section' : 'Sections'}
+              </div>
+            </div>
+
             {/* Subject Tabs */}
             {availableSubjects.length > 0 ? (
               <div className="flex w-full overflow-x-auto bg-gray-100 border border-gray-200" role="tablist">
@@ -1177,23 +1188,34 @@ const TakeTest = () => {
                 No subjects available. This test doesn't have any questions yet.
               </div>
             )}
-
-            {/* Question Info */}
-            <div className="flex justify-between items-center p-4 bg-gray-50">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">SECTIONS</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Question <span id="question-number">{currentQuestion}</span>/{filteredQuestions.length}</span>
-                <div className="bg-gray-200 px-3 py-1 rounded-lg text-sm">+4 / -1</div>
-              </div>
-            </div>
           </div>
         </section>
 
         <section id="question-container" className="mb-6">
+          {/* Question number display */}
+          <div className="question-number-display mt-2 mb-3 font-bold text-lg bg-blue-100 p-3 px-4 rounded-md w-full shadow-sm border-l-4 border-blue-500">
+            <div className="flex items-center justify-between relative z-10">
+              <div>
+                <span className="text-blue-700">Question {currentQuestion}</span>
+                <span className="text-gray-500 text-sm ml-2">of {filteredQuestions.length}</span>
+              </div>
+              {currentQuestionData && (
+                <div className="ml-4 bg-white px-2 py-1 rounded text-sm flex items-center shadow-sm">
+                  <span className="text-green-600 font-medium">+{currentQuestionData.marks || 4}</span>
+                  <span className="mx-1">/</span>
+                  <span className="text-red-600 font-medium">-{currentQuestionData.negativeMarks || 1}</span>
+                </div>
+              )}
+            </div>
+            {currentQuestionData && (
+              <div className="text-xs text-blue-600 mt-1 relative z-10">
+                {getSubjectDisplayName(currentQuestionData.subject, subjects)}
+              </div>
+            )}
+          </div>
+
           {/* Question text container with scrolling */}
-          <div id="question" className="mt-4 text-lg font-medium max-h-[300px] overflow-y-auto overflow-x-hidden p-6 border border-gray-100 rounded-lg relative scrollable-container bg-white">
+          <div id="question" className="mt-2 text-lg font-medium max-h-[300px] overflow-y-auto overflow-x-hidden p-6 border border-gray-100 rounded-lg relative scrollable-container bg-white">
             <div className="scroll-indicator"></div>
             <div className="question-text whitespace-pre-wrap break-words">
               {currentQuestionData?.text || "Question will appear here..."}
@@ -1683,6 +1705,33 @@ const TakeTest = () => {
         .main-content.panel-minimized {
             margin-right: 40px;
             width: calc(100% - 40px);
+        }
+
+        /* Question number display styling */
+        .question-number-display {
+            position: relative;
+            transition: all 0.3s ease;
+            background: linear-gradient(to right, #e6f0ff, #f0f7ff);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+
+        .question-number-display:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-number-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), transparent);
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 8px;
         }
         .status-legend {
             display: flex;
