@@ -51,6 +51,7 @@ interface TestSubmissionData {
   score?: number;
   totalScore?: number;
   submittedAt: string;
+  subjectPerformance?: Record<string, { correct: number, total: number, attempted: number }>;
 }
 
 /**
@@ -578,7 +579,7 @@ export const fetchTestQuestions = async (testId: string): Promise<Question[]> =>
 /**
  * Save test submission data including time taken
  */
-export const saveTestSubmission = (testId: string, answers: (string | null)[], timeTaken: { minutes: number; seconds: number }, score?: number, totalScore?: number): void => {
+export const saveTestSubmission = (testId: string, answers: (string | null)[], timeTaken: { minutes: number; seconds: number }, score?: number, totalScore?: number, subjectPerformance?: Record<string, { correct: number, total: number }>): void => {
   console.log(`Saving test submission with score: ${score}, totalScore: ${totalScore}`);
   try {
     // Convert time taken to seconds for easier calculations
@@ -592,7 +593,8 @@ export const saveTestSubmission = (testId: string, answers: (string | null)[], t
       timeTakenSeconds,
       score,
       totalScore,
-      submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString(),
+      subjectPerformance
     };
 
     console.log("Saving submission data:", submissionData);
@@ -602,6 +604,11 @@ export const saveTestSubmission = (testId: string, answers: (string | null)[], t
     localStorage.setItem(`test_${testId}_answers`, JSON.stringify(answers));
     localStorage.setItem(`test_${testId}_time_taken`, JSON.stringify(timeTaken));
     localStorage.setItem(`test_${testId}_time_taken_seconds`, timeTakenSeconds.toString());
+
+    // Save subject performance separately for easier access
+    if (subjectPerformance) {
+      localStorage.setItem(`test_${testId}_subject_performance`, JSON.stringify(subjectPerformance));
+    }
 
     // Mark test as completed
     const completedTests = localStorage.getItem('completed_tests');

@@ -858,6 +858,9 @@ const TakeTest = () => {
       let score = 0;
       let totalPossibleScore = 0;
 
+      // Initialize an object for subject performance - will be populated based on actual questions
+      const subjectPerformance: Record<string, { correct: number, total: number, attempted: number }> = {};
+
       // In a real app, you would compare with correct answers from the server
       // This is a simplified example where we're using the isCorrect property
       questions.forEach((question, index) => {
@@ -868,16 +871,35 @@ const TakeTest = () => {
         // Add to total possible score
         totalPossibleScore += marks;
 
+        // Update subject totals
+        if (question.subject) {
+          // Initialize the subject if it doesn't exist
+          if (!subjectPerformance[question.subject]) {
+            subjectPerformance[question.subject] = { correct: 0, total: 0, attempted: 0 };
+          }
+          subjectPerformance[question.subject].total++;
+        }
+
         const selectedOption = selectedOptions[index];
         if (!selectedOption) {
           unattemptedCount++;
         } else {
+          // This question was attempted
+          if (question.subject && subjectPerformance[question.subject]) {
+            subjectPerformance[question.subject].attempted++;
+          }
+
           // Find if the selected option is correct
           // This is a simplified example - in a real app, you'd have proper answer checking
           const optionIndex = selectedOption.charCodeAt(0) - 65; // Convert A, B, C, D to 0, 1, 2, 3
           if (question.options[optionIndex]?.isCorrect) {
             correctCount++;
             score += marks; // Add marks for correct answer
+
+            // Update subject correct count
+            if (question.subject && subjectPerformance[question.subject]) {
+              subjectPerformance[question.subject].correct++;
+            }
           } else {
             incorrectCount++;
             score -= negativeMarks; // Subtract negative marks for incorrect answer
@@ -916,7 +938,8 @@ const TakeTest = () => {
           formattedAnswers,
           finalTimeTaken,
           finalResults.score,
-          finalResults.totalScore
+          finalResults.totalScore,
+          subjectPerformance
         );
         console.log(`Test submission saved with time taken: ${finalTimeTaken.minutes}m ${finalTimeTaken.seconds}s, score: ${finalResults.score}, totalScore: ${finalResults.totalScore}`);
       }

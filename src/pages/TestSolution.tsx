@@ -154,13 +154,28 @@ const TestSolution = () => {
           // Use the saved scores if available
           console.log("Using saved test submission data:", savedSubmission);
 
-          // Calculate other metrics but use the saved score and totalScore
-          calculateTestResultsWithSavedScores(
-            testQuestions,
-            savedAnswers ? JSON.parse(savedAnswers) : [],
-            savedSubmission.score,
-            savedSubmission.totalScore
-          );
+          // Check if we have saved subject performance data
+          if (savedSubmission.subjectPerformance) {
+            console.log("Using saved subject performance data:", savedSubmission.subjectPerformance);
+
+            // Use the saved subject performance data
+            const parsedAnswers = savedAnswers ? JSON.parse(savedAnswers) : [];
+            calculateTestResultsWithSavedData(
+              testQuestions,
+              parsedAnswers,
+              savedSubmission.score,
+              savedSubmission.totalScore,
+              savedSubmission.subjectPerformance
+            );
+          } else {
+            // Calculate other metrics but use the saved score and totalScore
+            calculateTestResultsWithSavedScores(
+              testQuestions,
+              savedAnswers ? JSON.parse(savedAnswers) : [],
+              savedSubmission.score,
+              savedSubmission.totalScore
+            );
+          }
         } else {
           // Fall back to calculating everything
           console.log("No saved test submission data found, calculating results");
@@ -177,6 +192,55 @@ const TestSolution = () => {
     loadTestAndResults();
   }, [id]);
 
+  const calculateTestResultsWithSavedData = (
+    questions: Question[],
+    answers: (string | null)[],
+    savedScore: number,
+    savedTotalScore: number,
+    savedSubjectPerformance: Record<string, { correct: number, total: number, attempted: number }>
+  ) => {
+    const totalQuestions = questions.length;
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let unattemptedCount = 0;
+
+    // Count correct, incorrect, and unattempted questions
+    questions.forEach((question, index) => {
+      const selectedAnswer = answers[index];
+      if (!selectedAnswer) {
+        unattemptedCount++;
+      } else {
+        // Check if answer is correct
+        const optionIndex = selectedAnswer.charCodeAt(0) - 65; // Convert A, B, C, D to 0, 1, 2, 3
+        if (question.options[optionIndex]?.isCorrect) {
+          correctCount++;
+        } else {
+          incorrectCount++;
+        }
+      }
+    });
+
+    // Use the saved score and totalScore values
+    const score = savedScore;
+    const totalScore = savedTotalScore;
+    const accuracy = Math.round((correctCount / (correctCount + incorrectCount)) * 100) || 0;
+
+    // Get the actual time taken from storage
+    const savedTimeTaken = id ? getTestTimeTaken(id) : null;
+    const timeTaken = savedTimeTaken || { minutes: 120, seconds: 45 }; // Fallback to mock time if not found
+
+    setTestResults({
+      score,
+      totalScore,
+      accuracy,
+      timeTaken,
+      correctAnswers: correctCount,
+      incorrectAnswers: incorrectCount,
+      unattemptedQuestions: unattemptedCount,
+      subjectPerformance: savedSubjectPerformance
+    });
+  };
+
   const calculateTestResultsWithSavedScores = (
     questions: Question[],
     answers: (string | null)[],
@@ -189,14 +253,14 @@ const TestSolution = () => {
     let unattemptedCount = 0;
 
     // Initialize an empty object for subject performance - will be populated based on actual questions
-    const subjectPerformance: Record<string, { correct: number, total: number }> = {};
+    const subjectPerformance: Record<string, { correct: number, total: number, attempted: number }> = {};
 
     questions.forEach((question, index) => {
       // Update subject totals
       if (question.subject) {
         // Initialize the subject if it doesn't exist
         if (!subjectPerformance[question.subject]) {
-          subjectPerformance[question.subject] = { correct: 0, total: 0 };
+          subjectPerformance[question.subject] = { correct: 0, total: 0, attempted: 0 };
         }
         subjectPerformance[question.subject].total++;
       }
@@ -205,6 +269,11 @@ const TestSolution = () => {
       if (!selectedAnswer) {
         unattemptedCount++;
       } else {
+        // This question was attempted
+        if (question.subject && subjectPerformance[question.subject]) {
+          subjectPerformance[question.subject].attempted++;
+        }
+
         // Check if answer is correct
         const optionIndex = selectedAnswer.charCodeAt(0) - 65; // Convert A, B, C, D to 0, 1, 2, 3
         if (question.options[optionIndex]?.isCorrect) {
@@ -212,7 +281,7 @@ const TestSolution = () => {
           if (question.subject) {
             // Initialize the subject if it doesn't exist
             if (!subjectPerformance[question.subject]) {
-              subjectPerformance[question.subject] = { correct: 0, total: 0 };
+              subjectPerformance[question.subject] = { correct: 0, total: 0, attempted: 0 };
             }
             subjectPerformance[question.subject].correct++;
           }
@@ -250,14 +319,14 @@ const TestSolution = () => {
     let unattemptedCount = 0;
 
     // Initialize an empty object for subject performance - will be populated based on actual questions
-    const subjectPerformance: Record<string, { correct: number, total: number }> = {};
+    const subjectPerformance: Record<string, { correct: number, total: number, attempted: number }> = {};
 
     questions.forEach((question, index) => {
       // Update subject totals
       if (question.subject) {
         // Initialize the subject if it doesn't exist
         if (!subjectPerformance[question.subject]) {
-          subjectPerformance[question.subject] = { correct: 0, total: 0 };
+          subjectPerformance[question.subject] = { correct: 0, total: 0, attempted: 0 };
         }
         subjectPerformance[question.subject].total++;
       }
@@ -266,6 +335,11 @@ const TestSolution = () => {
       if (!selectedAnswer) {
         unattemptedCount++;
       } else {
+        // This question was attempted
+        if (question.subject && subjectPerformance[question.subject]) {
+          subjectPerformance[question.subject].attempted++;
+        }
+
         // Check if answer is correct
         const optionIndex = selectedAnswer.charCodeAt(0) - 65; // Convert A, B, C, D to 0, 1, 2, 3
         if (question.options[optionIndex]?.isCorrect) {
@@ -273,7 +347,7 @@ const TestSolution = () => {
           if (question.subject) {
             // Initialize the subject if it doesn't exist
             if (!subjectPerformance[question.subject]) {
-              subjectPerformance[question.subject] = { correct: 0, total: 0 };
+              subjectPerformance[question.subject] = { correct: 0, total: 0, attempted: 0 };
             }
             subjectPerformance[question.subject].correct++;
           }
@@ -481,6 +555,7 @@ const TestSolution = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="col-span-1 md:col-span-2">
               <h3 className="text-lg font-semibold mb-3">Subject-wise Performance</h3>
+              <div className="text-xs text-gray-500 mb-3">(Correct / Attempted / Total)</div>
               <div className="space-y-4">
                 {/* Dynamically render only subjects that have questions */}
                 {Object.entries(testResults.subjectPerformance)
@@ -493,12 +568,12 @@ const TestSolution = () => {
                         {getSubjectDisplayName(subjectId, subjects)}
                       </span>
                       <span className="text-sm font-medium">
-                        {performance.correct} / {performance.total}
+                        {performance.correct} / {performance.attempted || 0} / {performance.total}
                       </span>
                     </div>
                     <Progress
-                      value={performance.total > 0
-                        ? (performance.correct / performance.total) * 100
+                      value={performance.attempted > 0
+                        ? (performance.correct / performance.attempted) * 100
                         : 0}
                       className="h-2"
                     />
