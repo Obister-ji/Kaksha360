@@ -97,6 +97,10 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
               If an account exists with the email <strong>{email}</strong>, you'll receive
               password reset instructions shortly.
             </p>
+            <p className="text-center text-sm text-muted-foreground">
+              If you don't see the reset link in your email, check your spam folder. If you're still having trouble,
+              you can try the <a href="/reset-password" className="text-primary hover:underline">direct reset page</a>.
+            </p>
             <div className="flex justify-center">
               <Button
                 type="button"
