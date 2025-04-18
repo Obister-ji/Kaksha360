@@ -96,24 +96,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resetPassword = async (email: string) => {
     try {
       setIsLoading(true);
-
-      // Get the current origin
-      const origin = window.location.origin;
-
-      // Create the redirect URL - ensure it works in both development and production
-      const redirectUrl = `${origin}/reset-password`;
-
-      console.log(`Sending password reset email with redirect to: ${redirectUrl}`);
-
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (error) throw error;
 
       toast.success("Password reset instructions sent to your email");
     } catch (error: any) {
-      console.error("Error sending password reset email:", error);
       toast.error(error.message || "Error sending password reset email");
       throw error;
     } finally {
