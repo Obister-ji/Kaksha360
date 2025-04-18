@@ -24,6 +24,7 @@ const TakeTest = () => {
   const [isTestAvailable, setIsTestAvailable] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<(string | null)[]>([]);
+  const [tempSelectedOption, setTempSelectedOption] = useState<string | null>(null);
   const [questionStatus, setQuestionStatus] = useState<QuestionStatus[]>([]);
   const [counters, setCounters] = useState({
     "not-visited": 0,
@@ -78,6 +79,14 @@ const TakeTest = () => {
   const currentQuestionIndex = currentQuestionData
     ? questions.findIndex(q => q.id === currentQuestionData.id)
     : -1;
+
+  // Update tempSelectedOption when currentQuestion changes
+  useEffect(() => {
+    if (currentQuestionIndex !== -1) {
+      // Set tempSelectedOption to the saved answer for this question (if any)
+      setTempSelectedOption(selectedOptions[currentQuestionIndex]);
+    }
+  }, [currentQuestion, currentQuestionIndex, selectedOptions]);
 
   // Add scroll indicators to scrollable containers
   useEffect(() => {
@@ -707,26 +716,17 @@ const TakeTest = () => {
     });
   }, [currentQuestionData, currentQuestionIndex]); // Depend on test so timer starts when test data is loaded
 
-  // Handle option selection
+  // Handle option selection - only updates the temporary selection
   const handleOptionSelect = (option: string) => {
     if (!currentQuestionData || currentQuestionIndex === -1) {
       console.error("Cannot select option: No current question data");
       return;
     }
 
-    console.log(`Selecting option ${option} for question at index ${currentQuestionIndex}`);
+    console.log(`Temporarily selecting option ${option} for question at index ${currentQuestionIndex}`);
 
-    setSelectedOptions(prev => {
-      const updated = [...prev];
-      updated[currentQuestionIndex] = option;
-      return updated;
-    });
-
-    if (questionStatus[currentQuestionIndex] === "review") {
-      updateQuestionStatus(currentQuestionIndex, "review-with-answer");
-    } else {
-      updateQuestionStatus(currentQuestionIndex, "answered");
-    }
+    // Only update the temporary selection, not the actual saved answer
+    setTempSelectedOption(option);
   };
 
   // Handle mark for review
@@ -756,6 +756,9 @@ const TakeTest = () => {
 
     console.log(`Clearing selection for question at index ${currentQuestionIndex}`);
 
+    // Clear both the temporary selection and the saved selection
+    setTempSelectedOption(null);
+
     setSelectedOptions(prev => {
       const updated = [...prev];
       updated[currentQuestionIndex] = null;
@@ -771,6 +774,12 @@ const TakeTest = () => {
   // Handle navigation
   const handlePrevQuestion = () => {
     if (currentQuestion > 1) {
+      // If there's a temporary selection, discard it when moving to previous question
+      if (tempSelectedOption) {
+        console.log(`Discarding temporary selection for question at index ${currentQuestionIndex}`);
+        setTempSelectedOption(null);
+      }
+
       if (currentQuestionData && currentQuestionIndex !== -1 && questionStatus[currentQuestionIndex] === "not-visited") {
         updateQuestionStatus(currentQuestionIndex, "unanswered");
       }
@@ -780,15 +789,42 @@ const TakeTest = () => {
 
   const handleNextQuestion = () => {
     if (filteredQuestions.length > 0 && currentQuestion < filteredQuestions.length) {
-      if (currentQuestionData && currentQuestionIndex !== -1 && questionStatus[currentQuestionIndex] === "not-visited") {
+      // Save the temporary selected option to the actual selectedOptions array
+      if (tempSelectedOption && currentQuestionIndex !== -1) {
+        console.log(`Saving option ${tempSelectedOption} for question at index ${currentQuestionIndex}`);
+
+        setSelectedOptions(prev => {
+          const updated = [...prev];
+          updated[currentQuestionIndex] = tempSelectedOption;
+          return updated;
+        });
+
+        // Update question status based on the saved answer
+        if (questionStatus[currentQuestionIndex] === "review") {
+          updateQuestionStatus(currentQuestionIndex, "review-with-answer");
+        } else {
+          updateQuestionStatus(currentQuestionIndex, "answered");
+        }
+      } else if (currentQuestionData && currentQuestionIndex !== -1 && questionStatus[currentQuestionIndex] === "not-visited") {
         updateQuestionStatus(currentQuestionIndex, "unanswered");
       }
+
+      // Move to the next question
       setCurrentQuestion(prev => prev + 1);
+
+      // Reset the temporary selection for the next question
+      setTempSelectedOption(null);
     }
   };
 
   // Handle question selection from status list
   const handleQuestionSelect = (questionNumber: number) => {
+    // If there's a temporary selection, discard it when jumping to another question
+    if (tempSelectedOption) {
+      console.log(`Discarding temporary selection for question at index ${currentQuestionIndex}`);
+      setTempSelectedOption(null);
+    }
+
     // Find the question in the full questions array
     const selectedQuestion = questions[questionNumber - 1];
     if (!selectedQuestion) {
@@ -832,6 +868,20 @@ const TakeTest = () => {
 
   // Handle test submission
   const handleSubmitTest = (isAutoSubmit = false) => {
+    // Save any pending temporary selection before submitting
+    if (tempSelectedOption && currentQuestionIndex !== -1) {
+      console.log(`Saving pending temporary selection ${tempSelectedOption} for question at index ${currentQuestionIndex} before submission`);
+
+      setSelectedOptions(prev => {
+        const updated = [...prev];
+        updated[currentQuestionIndex] = tempSelectedOption;
+        return updated;
+      });
+
+      // Clear the temporary selection
+      setTempSelectedOption(null);
+    }
+
     // Skip confirmation for auto-submissions when time runs out
     if (isAutoSubmit || window.confirm("Are you sure you want to submit the test? You cannot change your answers after submission.")) {
       // Calculate time taken based on the test duration
@@ -1172,7 +1222,7 @@ const TakeTest = () => {
                 <div key={index}>
                   {/* Option text container with scrolling */}
                   <div
-                    className={`option-container scrollable-container ${selectedOptions[currentQuestionIndex] === optionLetter ? 'selected' : ''}`}
+                    className={`option-container scrollable-container ${(tempSelectedOption === optionLetter || (!tempSelectedOption && selectedOptions[currentQuestionIndex] === optionLetter)) ? 'selected' : ''}`}
                     data-option={optionLetter}
                     onClick={() => handleOptionSelect(optionLetter)}
                   >
@@ -1188,7 +1238,7 @@ const TakeTest = () => {
                   {/* Option image container without scrolling */}
                   {option.imageUrl && (
                     <div
-                      className={`mt-1 p-3 border border-gray-200 rounded-lg bg-white ${selectedOptions[currentQuestionIndex] === optionLetter ? 'option-image-selected' : ''}`}
+                      className={`mt-1 p-3 border border-gray-200 rounded-lg bg-white ${(tempSelectedOption === optionLetter || (!tempSelectedOption && selectedOptions[currentQuestionIndex] === optionLetter)) ? 'option-image-selected' : ''}`}
                       onClick={() => handleOptionSelect(optionLetter)}
                     >
                       <img
