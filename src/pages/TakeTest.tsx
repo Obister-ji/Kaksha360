@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertCircle, ArrowLeft, Clock, UserCircle2, CalendarClock, Timer, Square, X, CheckSquare, HelpCircle, Search } from "lucide-react";
 import { fetchTestQuestions, fetchTests, saveTestSubmission } from "@/services/testService";
 import { fetchSubjects } from "@/services/subjectService";
@@ -37,6 +38,7 @@ const TakeTest = () => {
   const [timeTaken, setTimeTaken] = useState({ minutes: 0, seconds: 0 });
   const [isTestSubmitted, setIsTestSubmitted] = useState(false);
   const [isStatusPanelMinimized, setIsStatusPanelMinimized] = useState(false);
+  const [isLastQuestionDialogOpen, setIsLastQuestionDialogOpen] = useState(false);
   const [testResults, setTestResults] = useState({
     score: 0,
     totalScore: 0,
@@ -788,28 +790,48 @@ const TakeTest = () => {
   };
 
   const handleNextQuestion = () => {
-    if (filteredQuestions.length > 0 && currentQuestion < filteredQuestions.length) {
-      // Save the temporary selected option to the actual selectedOptions array
-      if (tempSelectedOption && currentQuestionIndex !== -1) {
-        console.log(`Saving option ${tempSelectedOption} for question at index ${currentQuestionIndex}`);
+    // Save the temporary selected option to the actual selectedOptions array
+    if (tempSelectedOption && currentQuestionIndex !== -1) {
+      console.log(`Saving option ${tempSelectedOption} for question at index ${currentQuestionIndex}`);
 
-        setSelectedOptions(prev => {
-          const updated = [...prev];
-          updated[currentQuestionIndex] = tempSelectedOption;
-          return updated;
-        });
+      setSelectedOptions(prev => {
+        const updated = [...prev];
+        updated[currentQuestionIndex] = tempSelectedOption;
+        return updated;
+      });
 
-        // Update question status based on the saved answer
-        if (questionStatus[currentQuestionIndex] === "review") {
-          updateQuestionStatus(currentQuestionIndex, "review-with-answer");
-        } else {
-          updateQuestionStatus(currentQuestionIndex, "answered");
-        }
-      } else if (currentQuestionData && currentQuestionIndex !== -1 && questionStatus[currentQuestionIndex] === "not-visited") {
-        updateQuestionStatus(currentQuestionIndex, "unanswered");
+      // Update question status based on the saved answer
+      if (questionStatus[currentQuestionIndex] === "review") {
+        updateQuestionStatus(currentQuestionIndex, "review-with-answer");
+      } else {
+        updateQuestionStatus(currentQuestionIndex, "answered");
+      }
+    } else if (currentQuestionData && currentQuestionIndex !== -1 && questionStatus[currentQuestionIndex] === "not-visited") {
+      updateQuestionStatus(currentQuestionIndex, "unanswered");
+    }
+
+    // Check if we're at the last question of the current section
+    if (filteredQuestions.length > 0 && currentQuestion === filteredQuestions.length) {
+      // Find the current subject index
+      const currentSubjectIndex = availableSubjects.indexOf(subject);
+
+      // Check if there's a next section
+      if (currentSubjectIndex < availableSubjects.length - 1) {
+        // Move to the first question of the next section
+        const nextSubject = availableSubjects[currentSubjectIndex + 1];
+        console.log(`Moving to next section: ${nextSubject}`);
+        setSubject(nextSubject);
+        setCurrentQuestion(1);
+      } else {
+        // This is the last section and last question
+        console.log('Last question of the exam reached');
+        setIsLastQuestionDialogOpen(true);
       }
 
-      // Move to the next question
+      // Reset the temporary selection
+      setTempSelectedOption(null);
+    } else if (filteredQuestions.length > 0 && currentQuestion < filteredQuestions.length) {
+      // Move to the next question within the current section
       setCurrentQuestion(prev => prev + 1);
 
       // Reset the temporary selection for the next question
@@ -1281,57 +1303,59 @@ const TakeTest = () => {
 
         </section>
 
-        <footer className="flex justify-between mt-8 gap-1 px-1 sm:gap-2 sm:px-2">
-          <Button
-            id="prev-btn"
-            className="w-[23%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
-            onClick={handlePrevQuestion}
-            disabled={currentQuestion === 1}
-            style={{
-              backgroundColor: currentQuestion === 1 ? '#d4ddf7' : '#3664ef',
-              height: '48px',
-              maxWidth: '250px'
-            }}
-          >
-            Previous
-          </Button>
-          <Button
-            id="clear-option-btn"
-            className="w-[23%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
-            onClick={handleClearSelection}
-            style={{
-              backgroundColor: '#3664ef',
-              height: '48px',
-              maxWidth: '250px'
-            }}
-          >
-            Clear Option
-          </Button>
-          <Button
-            id="mark-review-btn"
-            className="w-[23%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
-            onClick={handleMarkReview}
-            style={{
-              backgroundColor: '#3664ef',
-              height: '48px',
-              maxWidth: '250px'
-            }}
-          >
-            Mark Review
-          </Button>
-          <Button
-            id="next-btn"
-            className="w-[23%] py-3 text-white rounded-md hover:opacity-90 text-sm sm:text-base sm:flex-1"
-            onClick={handleNextQuestion}
-            disabled={currentQuestion === filteredQuestions.length}
-            style={{
-              backgroundColor: currentQuestion === filteredQuestions.length ? '#d4ddf7' : '#3664ef',
-              height: '48px',
-              maxWidth: '250px'
-            }}
-          >
-            Save & Next
-          </Button>
+        <footer className="mt-8 navigation-buttons">
+          <div className="button-container-stacked">
+            {/* Top row - Clear Option and Mark Review */}
+            <div className="button-row">
+              <Button
+                id="clear-option-btn"
+                className="nav-button"
+                onClick={handleClearSelection}
+                style={{
+                  backgroundColor: '#4b5563'
+                }}
+              >
+                <span className="button-text">Clear Option</span>
+              </Button>
+              <Button
+                id="mark-review-btn"
+                className="nav-button"
+                onClick={handleMarkReview}
+                style={{
+                  backgroundColor: '#4b5563'
+                }}
+              >
+                <span className="button-text">Mark Review</span>
+              </Button>
+            </div>
+
+            {/* Bottom row - Previous and Next */}
+            <div className="button-row">
+              <Button
+                id="prev-btn"
+                className="nav-button"
+                onClick={handlePrevQuestion}
+                disabled={currentQuestion === 1}
+                style={{
+                  backgroundColor: currentQuestion === 1 ? '#d4ddf7' : '#3664ef',
+                  opacity: currentQuestion === 1 ? 0.7 : 1
+                }}
+              >
+                <span className="button-text">Previous</span>
+              </Button>
+              <Button
+                id="next-btn"
+                className="nav-button"
+                onClick={handleNextQuestion}
+                style={{
+                  backgroundColor: '#3664ef',
+                  opacity: 1
+                }}
+              >
+                <span className="button-text">Save & Next</span>
+              </Button>
+            </div>
+          </div>
         </footer>
       </div>
 
@@ -1412,6 +1436,31 @@ const TakeTest = () => {
           <div><div className="color-box bg-purple-400"></div>Review with Answer <span className="font-semibold ml-auto">{counters["review-with-answer"]}</span></div>
         </div>
       </div>
+
+      {/* Last Question Dialog */}
+      <Dialog open={isLastQuestionDialogOpen} onOpenChange={setIsLastQuestionDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>End of Exam Reached</DialogTitle>
+            <DialogDescription>
+              You have reached the last question of the exam. Do you want to go to the first question of the first section?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLastQuestionDialogOpen(false)}>No</Button>
+            <Button
+              onClick={() => {
+                setIsLastQuestionDialogOpen(false);
+                setSubject(availableSubjects[0]);
+                setCurrentQuestion(1);
+              }}
+              className="bg-blue-500 text-white hover:bg-blue-600"
+            >
+              Yes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       </>
       )}
 
@@ -1733,6 +1782,20 @@ const TakeTest = () => {
             z-index: 0;
             border-radius: 8px;
         }
+
+        /* Section name display styling */
+        .section-name-display {
+            position: relative;
+            transition: all 0.3s ease;
+            background: linear-gradient(to right, #f9fafb, #f3f4f6);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+        }
+
+        .section-name-display:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
         .status-legend {
             display: flex;
             flex-direction: column;
@@ -1810,6 +1873,120 @@ const TakeTest = () => {
             font-size: 0.75rem;
             min-width: 20px;
             text-align: center;
+        }
+
+        /* Navigation buttons styling */
+        .navigation-buttons {
+            width: 100%;
+        }
+
+        .button-container-stacked {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .button-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+
+        .nav-button {
+            height: 48px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            color: white;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-text {
+            font-size: 14px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Previous and Next buttons are slightly larger and more prominent */
+        #prev-btn, #next-btn {
+            height: 52px;
+            background-image: linear-gradient(to bottom, #3b82f6, #2563eb);
+            box-shadow: 0 3px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Clear and Mark Review buttons have a different style */
+        #clear-option-btn, #mark-review-btn {
+            background-image: linear-gradient(to bottom, #4b5563, #374151);
+            box-shadow: 0 2px 4px rgba(75, 85, 99, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .button-container-stacked {
+                gap: 10px;
+            }
+
+            .button-row {
+                gap: 10px;
+            }
+
+            .nav-button {
+                height: 44px;
+                border-radius: 6px;
+            }
+
+            #prev-btn, #next-btn {
+                height: 48px;
+            }
+
+            .button-text {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .button-container-stacked {
+                gap: 8px;
+            }
+
+            .button-row {
+                gap: 8px;
+            }
+
+            .nav-button {
+                height: 40px;
+                padding: 0 8px;
+            }
+
+            #prev-btn, #next-btn {
+                height: 44px;
+            }
+
+            .button-text {
+                font-size: 12px;
+            }
         }
       `}</style>
     </div>
