@@ -1137,31 +1137,67 @@ const TakeTest = () => {
       ) : (
         <>
         {/* Main content */}
-        <div className={`main-content w-full max-w-7xl mx-auto mt-4 p-6 bg-white shadow-lg rounded-lg ${isStatusPanelMinimized ? 'panel-minimized' : ''}`}>
-        <header className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">{test?.title}</h1>
-          <div className="timer">
-            <span
-              id="timer"
-              className={`font-bold ${timeRemaining.minutes <= 5 ?
-                timeRemaining.minutes <= 1 ? 'text-red-600 animate-pulse' : 'text-amber-600' :
-                'text-blue-600'}`}
-            >
-              {timeRemaining.minutes}:{timeRemaining.seconds < 10 ? '0' : ''}{timeRemaining.seconds}
-            </span>
-            <span className="ml-1 text-gray-600">MIN</span>
+        <div className={`main-content w-full max-w-7xl mx-auto mt-4 p-3 sm:p-6 bg-white shadow-lg rounded-lg ${isStatusPanelMinimized ? 'panel-minimized' : ''}`}>
+        <header className="mb-6">
+          {/* Mobile header layout */}
+          <div className="block sm:hidden">
+            <div className="flex justify-between items-center mb-2">
+              <div className="timer flex items-center">
+                <span
+                  id="timer-mobile"
+                  className={`font-bold ${timeRemaining.minutes <= 5 ?
+                    timeRemaining.minutes <= 1 ? 'text-red-600 animate-pulse' : 'text-amber-600' :
+                    'text-blue-600'}`}
+                >
+                  {timeRemaining.minutes}:{timeRemaining.seconds < 10 ? '0' : ''}{timeRemaining.seconds}
+                </span>
+                <span className="ml-1 text-gray-600 text-sm">MIN</span>
+              </div>
+              <Button
+                className="px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm"
+                onClick={handleSubmitTest}
+              >
+                Submit
+              </Button>
+            </div>
+            <h1 className="test-title text-lg font-bold truncate w-full">{test?.title}</h1>
             {timeRemaining.minutes <= 5 && (
-              <div className="text-xs text-red-500 mt-1">
+              <div className="text-xs text-red-500 mt-1 text-center">
                 {timeRemaining.minutes <= 1 ? 'Almost out of time!' : 'Time running out!'}
               </div>
             )}
           </div>
-          <Button
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-            onClick={handleSubmitTest}
-          >
-            Submit
-          </Button>
+
+          {/* Desktop header layout */}
+          <div className="hidden sm:flex sm:flex-row sm:justify-between sm:items-center">
+            <h1 className="test-title text-2xl font-bold truncate max-w-[40%]">{test?.title}</h1>
+            <div className="flex items-center gap-4">
+              <div className="timer flex flex-col items-start">
+                <div className="flex items-center">
+                  <span
+                    id="timer"
+                    className={`font-bold ${timeRemaining.minutes <= 5 ?
+                      timeRemaining.minutes <= 1 ? 'text-red-600 animate-pulse' : 'text-amber-600' :
+                      'text-blue-600'}`}
+                  >
+                    {timeRemaining.minutes}:{timeRemaining.seconds < 10 ? '0' : ''}{timeRemaining.seconds}
+                  </span>
+                  <span className="ml-1 text-gray-600">MIN</span>
+                </div>
+                {timeRemaining.minutes <= 5 && (
+                  <div className="text-xs text-red-500 mt-1">
+                    {timeRemaining.minutes <= 1 ? 'Almost out of time!' : 'Time running out!'}
+                  </div>
+                )}
+              </div>
+              <Button
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                onClick={handleSubmitTest}
+              >
+                Submit
+              </Button>
+            </div>
+          </div>
         </header>
 
         <section className="mb-6">
@@ -1620,11 +1656,17 @@ const TakeTest = () => {
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
         }
         .timer {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             color: red;
             font-weight: bold;
-            display: flex;
-            align-items: center;
+        }
+
+        @media (min-width: 640px) {
+            .timer {
+                font-size: 1.2rem;
+                display: flex;
+                align-items: center;
+            }
         }
         .aside-right {
             position: fixed;
@@ -1795,6 +1837,14 @@ const TakeTest = () => {
         .section-name-display:hover {
             transform: translateY(-1px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Test title styling */
+        .test-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: break-all;
         }
         .status-legend {
             display: flex;
