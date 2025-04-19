@@ -221,18 +221,31 @@ const StudyMaterialContent = ({ userRole }: StudyMaterialContentProps) => {
 
   return (
     <SidebarInset className="bg-light">
-      <header className="sticky top-0 z-90 bg-white shadow-sm py-5 px-8 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <SidebarTrigger className="text-primary" />
-          <h1 className="text-2xl font-playfair text-primary">Study Materials</h1>
+      <header className="sticky top-0 z-90 bg-white shadow-sm py-3 sm:py-5 px-4 sm:px-8 flex flex-wrap sm:flex-nowrap justify-between items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="text-primary" />
+            <h1 className="text-xl sm:text-2xl font-playfair text-primary truncate">Study Materials</h1>
+          </div>
+          <div className="flex sm:hidden items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadStudyMaterials}
+              disabled={isLoading}
+              className="w-9 h-9 p-0 flex items-center justify-center"
+            >
+              <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between">
           <Button
             variant="outline"
             size="sm"
             onClick={loadStudyMaterials}
             disabled={isLoading}
-            className="flex items-center gap-1 mr-2"
+            className="hidden sm:flex items-center gap-1 mr-2"
           >
             <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
             <span className="hidden md:inline">Refresh</span>
@@ -250,28 +263,28 @@ const StudyMaterialContent = ({ userRole }: StudyMaterialContentProps) => {
         </div>
       </header>
 
-      <main className="px-8 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div className="relative w-64">
+      <main className="px-4 sm:px-8 py-6 max-w-full overflow-hidden">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-6">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search study materials..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 text-sm"
             />
           </div>
           {isAdmin ? (
             <Button
               onClick={handleAddMaterial}
               disabled={isLoading}
-              className="bg-gold hover:bg-gold/90 text-white"
+              className="bg-gold hover:bg-gold/90 text-white text-xs sm:text-sm w-full sm:w-auto justify-center"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Study Material
             </Button>
           ) : (
-            <div className="text-sm text-gray-500 italic">
+            <div className="text-xs sm:text-sm text-gray-500 italic w-full sm:w-auto text-center sm:text-left">
               View-only mode. Contact an administrator for changes.
             </div>
           )}
@@ -313,12 +326,14 @@ const StudyMaterialContent = ({ userRole }: StudyMaterialContentProps) => {
             </div>
           ) : (
             filteredMaterials.map((material) => (
-              <div key={material.id} className="bg-white rounded-lg shadow p-6">
+              <div key={material.id} className="bg-white rounded-lg shadow p-4 sm:p-6 overflow-hidden w-full">
                 <div className="flex mb-4">
-                  {getFileTypeIcon(material.fileType)}
-                  <div className="ml-4">
-                    <h2 className="text-lg font-semibold">{material.title}</h2>
-                    <div className="text-sm text-gray-500">
+                  <div className="flex-shrink-0">
+                    {getFileTypeIcon(material.fileType)}
+                  </div>
+                  <div className="ml-3 sm:ml-4 min-w-0">
+                    <h2 className="text-base sm:text-lg font-semibold truncate">{material.title}</h2>
+                    <div className="text-xs sm:text-sm text-gray-500 truncate">
                       <span>{material.subject}</span>
                       <span className="mx-1">•</span>
                       <span>{material.fileType.toUpperCase()}</span>
@@ -326,37 +341,38 @@ const StudyMaterialContent = ({ userRole }: StudyMaterialContentProps) => {
                   </div>
                 </div>
 
-                <p className="text-gray-700 mb-4 text-sm">{material.description}</p>
+                <p className="text-gray-700 mb-4 text-xs sm:text-sm line-clamp-3">{material.description}</p>
 
-                <div className="text-xs text-gray-500 mb-4 flex items-center">
-                  <Calendar className="h-3 w-3 mr-1" />
-                  <span>Uploaded on {material.uploadDate} by {material.uploadedBy}</span>
+                <div className="text-xs text-gray-500 mb-4 flex items-center truncate">
+                  <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
+                  <span className="truncate">Uploaded on {material.uploadDate} by {material.uploadedBy}</span>
                 </div>
 
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
                   <a
                     href={material.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800"
+                    className="inline-flex items-center text-blue-600 hover:text-blue-800 text-xs sm:text-sm"
                   >
-                    <Download className="h-4 w-4 mr-1" />
+                    <Download className="h-4 w-4 mr-1 flex-shrink-0" />
                     Download
                   </a>
 
                   {isAdmin && (
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 w-full sm:w-auto justify-end">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleEditMaterial(material)}
+                        className="text-xs h-8 px-2"
                       >
                         Edit
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                        className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white text-xs h-8 px-2"
                         onClick={() => handleDeleteMaterial(material.id)}
                       >
                         Delete
@@ -370,7 +386,7 @@ const StudyMaterialContent = ({ userRole }: StudyMaterialContentProps) => {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-w-[95vw] overflow-hidden">
             <DialogHeader>
               <DialogTitle>{currentMaterial ? "Edit Study Material" : "Add New Study Material"}</DialogTitle>
             </DialogHeader>

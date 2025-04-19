@@ -58,44 +58,53 @@ const TestsContent = () => {
 
   return (
     <SidebarInset className="bg-light">
-      <header className="sticky top-0 z-90 bg-white shadow-sm py-5 px-8 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <SidebarTrigger className="text-primary" />
-          <h1 className="text-2xl font-playfair text-primary">Tests</h1>
+      <header className="sticky top-0 z-90 bg-white shadow-sm py-3 sm:py-5 px-4 sm:px-8 flex flex-wrap sm:flex-nowrap justify-between items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="text-primary" />
+            <h1 className="text-xl sm:text-2xl font-playfair text-primary">Tests</h1>
+          </div>
+          <div className="flex sm:hidden items-center">
+            <Button asChild variant="outline" size="sm" className="flex items-center w-9 h-9 p-0 justify-center">
+              <Link to="/" aria-label="Home">
+                <Home className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <Button asChild variant="outline" size="sm" className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between">
+          <Button asChild variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
             <Link to="/" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
               <span>Home</span>
             </Link>
           </Button>
-          <div className="flex items-center gap-2 bg-gold/10 px-4 py-2 rounded-full">
-            <UserCircle2 className="text-gold h-5 w-5" />
-            <span className="text-primary font-semibold text-sm">
+          <div className="flex items-center gap-2 bg-gold/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full truncate max-w-[200px] sm:max-w-none">
+            <UserCircle2 className="text-gold h-5 w-5 flex-shrink-0" />
+            <span className="text-primary font-semibold text-xs sm:text-sm truncate">
               {userProfile?.displayName || user?.user_metadata?.full_name || "Student"}
             </span>
           </div>
         </div>
       </header>
 
-      <main className="px-8 py-6">
+      <main className="px-4 sm:px-8 py-6 max-w-full overflow-hidden">
         {/* Search and filter bar */}
-        <div className="mb-6 flex justify-between items-center">
-          <div className="relative w-64">
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search tests..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 text-sm"
             />
           </div>
           <Button
             onClick={loadTests}
             variant="outline"
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-xs sm:text-sm h-9 w-full sm:w-auto justify-center"
           >
             <RefreshCw className="h-4 w-4" />
             <span>Refresh</span>

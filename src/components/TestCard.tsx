@@ -184,33 +184,33 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
   return (
     <>
       <div
-        className="bg-white p-6 rounded-lg shadow-md transition-all hover:translate-y-[-5px] hover:shadow-lg border-l-4 border-gold relative cursor-pointer"
+        className="bg-white p-4 sm:p-6 rounded-lg shadow-md transition-all hover:translate-y-[-5px] hover:shadow-lg border-l-4 border-gold relative cursor-pointer overflow-hidden w-full"
         onClick={() => setIsDetailsOpen(true)}
       >
-        <h3 className="font-playfair text-lg text-primary font-medium mb-2 pr-24">{title}</h3>
-        <div className="flex flex-wrap gap-5 text-text-light text-sm">
-          <span className="flex items-center gap-1">
-            <UserCircle2 className="h-4 w-4" />
-            Created by {instructor}
+        <h3 className="font-playfair text-lg text-primary font-medium mb-2 pr-16 sm:pr-24 truncate">{title}</h3>
+        <div className="flex flex-wrap gap-2 sm:gap-5 text-text-light text-xs sm:text-sm">
+          <span className="flex items-center gap-1 min-w-0 truncate">
+            <UserCircle2 className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">Created by {instructor}</span>
           </span>
-          <span className="flex items-center gap-1">
-            <CalendarClock className="h-4 w-4" />
-            {formattedDate}
+          <span className="flex items-center gap-1 min-w-0 truncate">
+            <CalendarClock className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{formattedDate}</span>
           </span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            {time}
+          <span className="flex items-center gap-1 min-w-0 truncate">
+            <Clock className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{time}</span>
           </span>
-          <span className="flex items-center gap-1">
-            <Timer className="h-4 w-4" />
-            {duration}
+          <span className="flex items-center gap-1 min-w-0 truncate">
+            <Timer className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{duration}</span>
           </span>
         </div>
 
         {/* Status badge */}
         <div
           className={cn(
-            "absolute top-6 right-6 px-3 py-1 rounded-full text-xs font-semibold",
+            "absolute top-4 sm:top-6 right-4 sm:right-6 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold",
             status === "ONLINE"
               ? "bg-green-100 text-green-600"
               : "bg-amber-100 text-amber-600"
@@ -224,7 +224,7 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
           {isCompleted ? (
             <Button
               size="sm"
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+              className="bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
               onClick={(e) => handleViewSolutions(e)}
             >
               View Solution
@@ -235,14 +235,14 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
                 size="sm"
                 className={`${testAvailability.isAvailable ? 'bg-gold hover:bg-gold/90' :
                   testAvailability.status === 'past' ? 'bg-gray-500' :
-                  testAvailability.status === 'future' ? 'bg-amber-500' : 'bg-gray-400'} text-white`}
+                  testAvailability.status === 'future' ? 'bg-amber-500' : 'bg-gray-400'} text-white text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9`}
                 onClick={(e) => handleStartTest(e)}
                 disabled={!testAvailability.isAvailable}
               >
                 {testAvailability.message}
               </Button>
               {testAvailability.status === 'future' && testAvailability.timeRemaining && (
-                <span className="text-xs text-amber-600 mt-1">{testAvailability.timeRemaining}</span>
+                <span className="text-xs text-amber-600 mt-1 max-w-[120px] sm:max-w-none truncate">{testAvailability.timeRemaining}</span>
               )}
             </div>
           )}
@@ -251,7 +251,7 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
 
       {/* Test Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] max-w-[95vw] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
             <DialogDescription>
@@ -259,29 +259,29 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="text-sm font-medium">Instructor:</span>
-              <span className="col-span-3">{instructor}</span>
+          <div className="grid gap-3 py-4 overflow-hidden">
+            <div className="grid grid-cols-3 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <span className="text-xs sm:text-sm font-medium">Instructor:</span>
+              <span className="col-span-2 sm:col-span-3 text-sm truncate">{instructor}</span>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="text-sm font-medium">Date:</span>
-              <span className="col-span-3">{formattedDate}</span>
+            <div className="grid grid-cols-3 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <span className="text-xs sm:text-sm font-medium">Date:</span>
+              <span className="col-span-2 sm:col-span-3 text-sm truncate">{formattedDate}</span>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="text-sm font-medium">Time:</span>
-              <span className="col-span-3">{time}</span>
+            <div className="grid grid-cols-3 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <span className="text-xs sm:text-sm font-medium">Time:</span>
+              <span className="col-span-2 sm:col-span-3 text-sm truncate">{time}</span>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="text-sm font-medium">Duration:</span>
-              <span className="col-span-3">{duration}</span>
+            <div className="grid grid-cols-3 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <span className="text-xs sm:text-sm font-medium">Duration:</span>
+              <span className="col-span-2 sm:col-span-3 text-sm truncate">{duration}</span>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="text-sm font-medium">Status:</span>
-              <span className="col-span-3">
+            <div className="grid grid-cols-3 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <span className="text-xs sm:text-sm font-medium">Status:</span>
+              <span className="col-span-2 sm:col-span-3">
                 <span
                   className={cn(
-                    "px-3 py-1 rounded-full text-xs font-semibold",
+                    "px-2 sm:px-3 py-1 rounded-full text-xs font-semibold inline-block",
                     status === "ONLINE"
                       ? "bg-green-100 text-green-600"
                       : "bg-amber-100 text-amber-600"
@@ -293,16 +293,17 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => setIsDetailsOpen(false)}
+              className="w-full sm:w-auto text-xs sm:text-sm h-9"
             >
               Close
             </Button>
             {isCompleted ? (
               <Button
-                className="bg-blue-500 hover:bg-blue-600 text-white"
+                className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto text-xs sm:text-sm h-9"
                 onClick={() => {
                   setIsDetailsOpen(false);
                   handleViewSolutions();
@@ -311,11 +312,11 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
                 View Solution
               </Button>
             ) : (
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center w-full sm:w-auto">
                 <Button
                   className={`${testAvailability.isAvailable ? 'bg-gold hover:bg-gold/90' :
                     testAvailability.status === 'past' ? 'bg-gray-500' :
-                    testAvailability.status === 'future' ? 'bg-amber-500' : 'bg-gray-400'} text-white`}
+                    testAvailability.status === 'future' ? 'bg-amber-500' : 'bg-gray-400'} text-white w-full sm:w-auto text-xs sm:text-sm h-9`}
                   onClick={() => {
                     setIsDetailsOpen(false);
                     handleStartTest();
@@ -325,7 +326,7 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
                   {testAvailability.message}
                 </Button>
                 {testAvailability.status === 'future' && testAvailability.timeRemaining && (
-                  <span className="text-xs text-amber-600 mt-2">{testAvailability.timeRemaining}</span>
+                  <span className="text-xs text-amber-600 mt-2 truncate max-w-full">{testAvailability.timeRemaining}</span>
                 )}
               </div>
             )}

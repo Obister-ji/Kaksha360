@@ -211,18 +211,31 @@ const VideosContent = ({ userRole }: VideosContentProps) => {
 
   return (
     <SidebarInset className="bg-light">
-      <header className="sticky top-0 z-90 bg-white shadow-sm py-5 px-8 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <SidebarTrigger className="text-primary" />
-          <h1 className="text-2xl font-playfair text-primary">Video Resources</h1>
+      <header className="sticky top-0 z-90 bg-white shadow-sm py-3 sm:py-5 px-4 sm:px-8 flex flex-wrap sm:flex-nowrap justify-between items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="text-primary" />
+            <h1 className="text-xl sm:text-2xl font-playfair text-primary truncate">Video Resources</h1>
+          </div>
+          <div className="flex sm:hidden items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadVideos}
+              disabled={isLoading}
+              className="w-9 h-9 p-0 flex items-center justify-center"
+            >
+              <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between">
           <Button
             variant="outline"
             size="sm"
             onClick={loadVideos}
             disabled={isLoading}
-            className="flex items-center gap-1 mr-2"
+            className="hidden sm:flex items-center gap-1 mr-2"
           >
             <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
             <span className="hidden md:inline">Refresh</span>
@@ -240,28 +253,28 @@ const VideosContent = ({ userRole }: VideosContentProps) => {
         </div>
       </header>
 
-      <main className="px-8 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div className="relative w-64">
+      <main className="px-4 sm:px-8 py-6 max-w-full overflow-hidden">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-6">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search videos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 text-sm"
             />
           </div>
           {isAdmin ? (
             <Button
               onClick={handleAddVideo}
               disabled={isLoading}
-              className="bg-gold hover:bg-gold/90 text-white"
+              className="bg-gold hover:bg-gold/90 text-white text-xs sm:text-sm w-full sm:w-auto justify-center"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Video
             </Button>
           ) : (
-            <div className="text-sm text-gray-500 italic">
+            <div className="text-xs sm:text-sm text-gray-500 italic w-full sm:w-auto text-center sm:text-left">
               View-only mode. Contact an administrator for changes.
             </div>
           )}
@@ -293,36 +306,37 @@ const VideosContent = ({ userRole }: VideosContentProps) => {
             </div>
           ) : (
             filteredVideos.map((video) => (
-              <div key={video.id} className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h2 className="text-xl font-semibold mb-2 flex items-center">
+              <div key={video.id} className="bg-white rounded-lg shadow overflow-hidden w-full">
+                <div className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
+                    <div className="w-full min-w-0">
+                      <h2 className="text-lg sm:text-xl font-semibold mb-2 flex items-center truncate">
                         {video.title}
                       </h2>
-                      <div className="flex items-center text-sm text-gray-500 mb-4">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        <span>{video.date}</span>
-                        <span className="mx-2">•</span>
-                        <span>{video.subject}</span>
-                        <span className="mx-2">•</span>
-                        <span>{video.uploadedBy}</span>
+                      <div className="flex flex-wrap items-center text-xs sm:text-sm text-gray-500 mb-4 gap-1 sm:gap-0">
+                        <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">{video.date}</span>
+                        <span className="mx-1 sm:mx-2 hidden sm:inline">•</span>
+                        <span className="truncate">{video.subject}</span>
+                        <span className="mx-1 sm:mx-2 hidden sm:inline">•</span>
+                        <span className="truncate">{video.uploadedBy}</span>
                       </div>
-                      <p className="text-gray-700 mb-4">{video.description}</p>
+                      <p className="text-gray-700 mb-4 text-xs sm:text-sm line-clamp-3">{video.description}</p>
                     </div>
                     {isAdmin && (
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 self-end sm:self-start">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleEditVideo(video)}
+                          className="text-xs h-8 px-2"
                         >
                           Edit
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                          className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white text-xs h-8 px-2"
                           onClick={() => handleDeleteVideo(video.id)}
                         >
                           Delete
@@ -334,22 +348,24 @@ const VideosContent = ({ userRole }: VideosContentProps) => {
                   <div className="flex justify-between items-center">
                     <Button
                       onClick={() => handlePlayVideo(video.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white"
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm h-9 px-3 sm:px-4"
                     >
-                      <Play className="h-4 w-4 mr-2" />
+                      <Play className="h-4 w-4 mr-2 flex-shrink-0" />
                       {activeVideoId === video.id ? "Hide Video" : "Watch Video"}
                     </Button>
                   </div>
                 </div>
 
                 {activeVideoId === video.id && (
-                  <div className="aspect-w-16 aspect-h-9 relative">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${video.youtubeId}`}
-                      className="w-full h-80 border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen>
-                    </iframe>
+                  <div className="relative w-full overflow-hidden">
+                    <div className="aspect-w-16 aspect-h-9 w-full">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${video.youtubeId}`}
+                        className="w-full h-48 sm:h-80 border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen>
+                      </iframe>
+                    </div>
                   </div>
                 )}
               </div>
@@ -358,7 +374,7 @@ const VideosContent = ({ userRole }: VideosContentProps) => {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-w-[95vw] overflow-hidden">
             <DialogHeader>
               <DialogTitle>{currentVideo ? "Edit Video" : "Add New Video"}</DialogTitle>
             </DialogHeader>
