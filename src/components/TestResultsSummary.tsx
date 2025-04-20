@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { Clock, CheckCircle, XCircle, HelpCircle, AlertCircle, Eye } from "lucide-react";
+import { Clock, CheckCircle, XCircle, HelpCircle, AlertCircle, Eye, Trophy } from "lucide-react";
 import { formatTimeObject } from "@/lib/utils";
+import { getRanking } from "@/services/rankingService";
+import { supabase } from "@/integrations/supabase/client";
+import RankSummary from "./RankSummary";
 
 interface TestResultsSummaryProps {
   score: number;
@@ -18,6 +21,7 @@ interface TestResultsSummaryProps {
   unattemptedQuestions: number;
   onViewSolutions: () => void;
   questions?: any[]; // Add questions to access marks and negativeMarks
+  testId?: string; // Add testId to fetch ranking information
 }
 
 const TestResultsSummary: React.FC<TestResultsSummaryProps> = ({
@@ -31,8 +35,44 @@ const TestResultsSummary: React.FC<TestResultsSummaryProps> = ({
   partiallyCorrectAnswers,
   unattemptedQuestions,
   onViewSolutions,
-  questions = []
+  questions = [],
+  testId
 }) => {
+  const [ranking, setRanking] = useState<{
+    batchRank: number;
+    batchTotal: number;
+    instituteRank: number;
+    instituteTotal: number;
+    percentile: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchRanking = async () => {
+      if (!testId) return;
+
+      try {
+        // Get current user
+        const { data: userData } = await supabase.auth.getUser();
+        if (!userData?.user?.id) return;
+
+        // Get ranking for this user and test
+        const rankingData = await getRanking(userData.user.id, testId);
+        if (rankingData) {
+          setRanking({
+            batchRank: rankingData.batchRank,
+            batchTotal: rankingData.batchTotal,
+            instituteRank: rankingData.instituteRank,
+            instituteTotal: rankingData.instituteTotal,
+            percentile: rankingData.percentile
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching ranking:", error);
+      }
+    };
+
+    fetchRanking();
+  }, [testId]);
   // Calculate total marks for correct answers
   const calculateCorrectMarks = () => {
     if (questions.length === 0) {
@@ -164,8 +204,23 @@ const TestResultsSummary: React.FC<TestResultsSummaryProps> = ({
         </div>
       </div>
 
-      {/* View Solutions Button */}
-      <div className="text-center">
+      {/* Ranking Section */}
+      {ranking && (
+        <div className="mb-8">
+          <h2 className="text-gray-600 font-semibold uppercase tracking-wide mb-4 text-center">YOUR RANKING</h2>
+          <RankSummary
+            batchRank={ranking.batchRank}
+            batchTotal={ranking.batchTotal}
+            instituteRank={ranking.instituteRank}
+            instituteTotal={ranking.instituteTotal}
+            percentile={ranking.percentile}
+            compact={true}
+          />
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="text-center space-y-4">
         <Button
           onClick={onViewSolutions}
           className="w-full py-6 text-white bg-blue-500 hover:bg-blue-600 font-medium text-lg flex items-center justify-center gap-2"
@@ -173,6 +228,16 @@ const TestResultsSummary: React.FC<TestResultsSummaryProps> = ({
           <Eye className="h-5 w-5" />
           View Detailed Solutions
         </Button>
+
+        {testId && (
+          <Button
+            onClick={() => window.location.href = `/leaderboard/${testId}`}
+            className="w-full py-4 text-white bg-purple-500 hover:bg-purple-600 font-medium flex items-center justify-center gap-2"
+          >
+            <Trophy className="h-5 w-5" />
+            View Leaderboard
+          </Button>
+        )}
       </div>
     </div>
   );

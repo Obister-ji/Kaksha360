@@ -21,6 +21,7 @@ import Doubts from "./pages/Doubts";
 import Performance from "./pages/Performance";
 import TakeTest from "./pages/TakeTest";
 import TestSolution from "./pages/TestSolution";
+import Leaderboard from "./pages/Leaderboard";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <TestSolution />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/leaderboard/:id"
+                element={
+                  <ProtectedRoute>
+                    <Leaderboard />
                   </ProtectedRoute>
                 }
               />

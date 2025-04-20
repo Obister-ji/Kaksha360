@@ -1,5 +1,5 @@
 
-import { CalendarClock, Clock, UserCircle2, Timer, ExternalLink } from "lucide-react";
+import { CalendarClock, Clock, UserCircle2, Timer, ExternalLink, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
@@ -167,6 +167,12 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
     navigate(`/test-solution/${id}`);
   };
 
+  // Handle view leaderboard button click
+  const handleViewLeaderboard = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation(); // Prevent opening the details dialog
+    navigate(`/leaderboard/${id}`);
+  };
+
   // Handle actual test start after instructions are read
   const handleStartAfterInstructions = () => {
     setIsInstructionsOpen(false);
@@ -219,16 +225,26 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
           {status}
         </div>
 
-        {/* Start Test or View Solution button */}
-        <div className="mt-4 flex justify-end">
+        {/* Start Test, View Solution, or Leaderboard buttons */}
+        <div className="mt-4 flex justify-end gap-2">
           {isCompleted ? (
-            <Button
-              size="sm"
-              className="bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
-              onClick={(e) => handleViewSolutions(e)}
-            >
-              View Solution
-            </Button>
+            <>
+              <Button
+                size="sm"
+                className="bg-purple-500 hover:bg-purple-600 text-white text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+                onClick={(e) => handleViewLeaderboard(e)}
+              >
+                <Trophy className="h-3 w-3 mr-1" />
+                Leaderboard
+              </Button>
+              <Button
+                size="sm"
+                className="bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+                onClick={(e) => handleViewSolutions(e)}
+              >
+                View Solution
+              </Button>
+            </>
           ) : (
             <div className="flex flex-col items-end">
               <Button
@@ -302,15 +318,27 @@ const TestCard = ({ id, title, instructor, date, time, duration, status, startDa
               Close
             </Button>
             {isCompleted ? (
-              <Button
-                className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto text-xs sm:text-sm h-9"
-                onClick={() => {
-                  setIsDetailsOpen(false);
-                  handleViewSolutions();
-                }}
-              >
-                View Solution
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <Button
+                  className="bg-purple-500 hover:bg-purple-600 text-white w-full sm:w-auto text-xs sm:text-sm h-9"
+                  onClick={() => {
+                    setIsDetailsOpen(false);
+                    handleViewLeaderboard();
+                  }}
+                >
+                  <Trophy className="h-3 w-3 mr-1" />
+                  Leaderboard
+                </Button>
+                <Button
+                  className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto text-xs sm:text-sm h-9"
+                  onClick={() => {
+                    setIsDetailsOpen(false);
+                    handleViewSolutions();
+                  }}
+                >
+                  View Solution
+                </Button>
+              </div>
             ) : (
               <div className="flex flex-col items-center w-full sm:w-auto">
                 <Button

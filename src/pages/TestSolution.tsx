@@ -15,7 +15,8 @@ import {
   Printer,
   Download,
   Eye,
-  EyeOff
+  EyeOff,
+  Trophy
 } from "lucide-react";
 import { fetchTestQuestions, fetchTests, getTestTimeTaken, getTestSubmission } from "@/services/testService";
 import { fetchSubjects } from "@/services/subjectService";
@@ -672,6 +673,10 @@ const TestSolution = () => {
             </div>
 
             <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate(`/leaderboard/${id}`)} className="flex items-center gap-1">
+                <Trophy className="h-4 w-4" />
+                Leaderboard
+              </Button>
               <Button variant="outline" size="sm" onClick={handlePrint} className="flex items-center gap-1">
                 <Printer className="h-4 w-4" />
                 Print

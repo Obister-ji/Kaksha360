@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { Building, Users, BarChart3 } from "lucide-react";
+import { Building, Users, BarChart3, Trophy } from "lucide-react";
 
 interface RankSummaryProps {
   batchRank: number;
@@ -8,6 +8,7 @@ interface RankSummaryProps {
   instituteRank: number;
   instituteTotal: number;
   percentile: number;
+  compact?: boolean;
 }
 
 const RankSummary: React.FC<RankSummaryProps> = ({
@@ -16,9 +17,80 @@ const RankSummary: React.FC<RankSummaryProps> = ({
   instituteRank,
   instituteTotal,
   percentile,
+  compact = false,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
 
+  // If compact mode is enabled, render a simplified version
+  if (compact) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Batch Rank */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 shadow-sm">
+          <div className="flex items-center mb-2">
+            <Users className="h-5 w-5 text-blue-600 mr-2" />
+            <h3 className="text-blue-800 font-medium text-sm">BATCH RANK</h3>
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-3xl font-bold text-blue-700">{batchRank}</span>
+            <span className="text-gray-500 ml-2 text-sm">out of {batchTotal}</span>
+          </div>
+          {batchRank === 1 && (
+            <div className="mt-2 text-xs text-blue-600 flex items-center">
+              <Trophy className="h-3 w-3 mr-1" />
+              <span>Congratulations! You're at the top of your batch!</span>
+            </div>
+          )}
+        </div>
+
+        {/* Institute Rank */}
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100 shadow-sm">
+          <div className="flex items-center mb-2">
+            <Building className="h-5 w-5 text-purple-600 mr-2" />
+            <h3 className="text-purple-800 font-medium text-sm">INSTITUTE RANK</h3>
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-3xl font-bold text-purple-700">{instituteRank}</span>
+            <span className="text-gray-500 ml-2 text-sm">out of {instituteTotal}</span>
+          </div>
+          {instituteRank === 1 && (
+            <div className="mt-2 text-xs text-purple-600 flex items-center">
+              <Trophy className="h-3 w-3 mr-1" />
+              <span>Congratulations! You're at the top of your institute!</span>
+            </div>
+          )}
+        </div>
+
+        {/* Percentile */}
+        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-lg border border-amber-100 shadow-sm md:col-span-2">
+          <div className="flex items-center mb-2">
+            <BarChart3 className="h-5 w-5 text-amber-600 mr-2" />
+            <h3 className="text-amber-800 font-medium text-sm">PERCENTILE</h3>
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-3xl font-bold text-amber-700">{percentile.toFixed(2)}</span>
+            <span className="text-gray-500 ml-2 text-sm">%</span>
+          </div>
+          <div className="mt-2">
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                className="bg-amber-600 h-2.5 rounded-full"
+                style={{ width: `${percentile}%` }}
+              ></div>
+            </div>
+          </div>
+          {percentile >= 90 && (
+            <div className="mt-2 text-xs text-amber-600 flex items-center">
+              <Trophy className="h-3 w-3 mr-1" />
+              <span>Excellent! You're in the top {100 - Math.floor(percentile)}% of test takers!</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Full version for standalone use
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 my-4">
       <div className="flex justify-between items-start mb-6">

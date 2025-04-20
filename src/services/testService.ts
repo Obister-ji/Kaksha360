@@ -4,6 +4,7 @@ import { Question } from "@/components/TestQuestionForm";
 import { toast } from "sonner";
 import { secondsToTimeObject, timeObjectToSeconds } from "@/lib/utils";
 import { safelyStoreInLocalStorage, safelyRetrieveFromLocalStorage } from "@/utils/storageUtils";
+import { saveTestResult, getRanking } from "@/services/rankingService";
 
 // Fallback test data in case Supabase tables don't exist yet
 const fallbackTests: TestSchedule[] = [
@@ -579,7 +580,7 @@ export const fetchTestQuestions = async (testId: string): Promise<Question[]> =>
 /**
  * Save test submission data including time taken
  */
-export const saveTestSubmission = (testId: string, answers: (string | null)[], timeTaken: { minutes: number; seconds: number }, score?: number, totalScore?: number, subjectPerformance?: Record<string, { correct: number, total: number }>): void => {
+export const saveTestSubmission = async (testId: string, answers: (string | null)[], timeTaken: { minutes: number; seconds: number }, score?: number, totalScore?: number, subjectPerformance?: Record<string, { correct: number, total: number, attempted: number }>): Promise<void> => {
   console.log(`Saving test submission with score: ${score}, totalScore: ${totalScore}`);
   try {
     // Convert time taken to seconds for easier calculations
@@ -599,7 +600,7 @@ export const saveTestSubmission = (testId: string, answers: (string | null)[], t
 
     console.log("Saving submission data:", submissionData);
 
-    // Save to localStorage
+    // Save to localStorage for backward compatibility
     localStorage.setItem(`test_${testId}_submission`, JSON.stringify(submissionData));
     localStorage.setItem(`test_${testId}_answers`, JSON.stringify(answers));
     localStorage.setItem(`test_${testId}_time_taken`, JSON.stringify(timeTaken));
@@ -616,6 +617,44 @@ export const saveTestSubmission = (testId: string, answers: (string | null)[], t
     if (!testsArray.includes(testId)) {
       testsArray.push(testId);
       localStorage.setItem('completed_tests', JSON.stringify(testsArray));
+    }
+
+    // Save to database if we have a user ID
+    const { data: userData } = await supabase.auth.getUser();
+    if (userData?.user?.id && score !== undefined && totalScore !== undefined) {
+      // Convert answers array to object with question indices as keys
+      const answersObject: Record<string, string | null> = {};
+      answers.forEach((answer, index) => {
+        answersObject[index.toString()] = answer;
+      });
+
+      // Calculate accuracy
+      const correctAnswers = Object.values(subjectPerformance || {}).reduce((sum, subject) => sum + subject.correct, 0);
+      const totalAnswered = Object.values(subjectPerformance || {}).reduce((sum, subject) => sum + subject.attempted, 0);
+      const accuracy = totalAnswered > 0 ? (correctAnswers / totalAnswered) * 100 : 0;
+
+      // Calculate unattempted questions
+      const totalQuestions = answers.length;
+      const unattemptedQuestions = answers.filter(a => a === null).length;
+      const incorrectAnswers = totalAnswered - correctAnswers;
+
+      // Save to database
+      await saveTestResult({
+        userId: userData.user.id,
+        testId,
+        score,
+        totalScore,
+        accuracy,
+        timeTakenSeconds,
+        correctAnswers,
+        incorrectAnswers,
+        unattemptedQuestions,
+        answers: answersObject,
+        subjectPerformance,
+        submittedAt: new Date().toISOString()
+      });
+
+      console.log(`Test result saved to database for user ${userData.user.id}, test ${testId}`);
     }
 
     console.log(`Test submission saved for test ID: ${testId}`);
