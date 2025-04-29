@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertCircle, ArrowLeft, Clock, UserCircle2, CalendarClock, Timer, Square, X, CheckSquare, HelpCircle, Search, Trash2, Flag, ArrowRight } from "lucide-react";
+import { AlertCircle, ArrowLeft, Clock, UserCircle2, CalendarClock, Timer, Square, X, CheckSquare, HelpCircle, Search } from "lucide-react";
 import { fetchTestQuestions, fetchTests, saveTestSubmission } from "@/services/testService";
 import { fetchSubjects } from "@/services/subjectService";
 import { TestSchedule } from "@/types/test";
@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import TestResultsSummary from "@/components/TestResultsSummary";
 import "@/styles/small-text.css";
 import "@/styles/fixed-nav.css";
-import "@/styles/professional-ui.css";
 
 type QuestionStatus = "not-visited" | "unanswered" | "answered" | "review" | "review-with-answer";
 
@@ -1117,7 +1116,7 @@ const TakeTest = () => {
   }
 
   return (
-    <div className="bg-[#F2EFE7] text-[#006A71] min-h-screen w-full">
+    <div className="bg-gray-100 text-gray-800 min-h-screen w-full">
       {isTestSubmitted ? (
         <>
           <TestResultsSummary
@@ -1141,36 +1140,27 @@ const TakeTest = () => {
       ) : (
         <>
         {/* Main content */}
-        <div className={`main-content main-content-with-fixed-nav w-full max-w-7xl mx-auto mt-4 p-3 sm:p-6 bg-[#F2EFE7] shadow-md rounded-lg border border-[#9ACBD0] ${isStatusPanelMinimized ? 'panel-minimized' : ''}`}>
+        <div className={`main-content main-content-with-fixed-nav w-full max-w-7xl mx-auto mt-4 p-3 sm:p-6 bg-white shadow-lg rounded-lg ${isStatusPanelMinimized ? 'panel-minimized' : ''}`}>
         <header className="mb-6">
-          {/* Progress bar */}
-          <div className="test-progress-bar">
-            <div
-              className="test-progress-bar-fill"
-              style={{ width: `${(currentQuestion / filteredQuestions.length) * 100}%` }}
-            ></div>
-          </div>
-
           {/* Mobile header layout */}
           <div className="block sm:hidden">
             <div className="flex justify-between items-center mb-2">
               <div className="timer flex items-center">
                 <span
                   id="timer-mobile"
-                  className={`font-bold timer ${timeRemaining.minutes <= 5 ?
-                    timeRemaining.minutes <= 1 ? 'danger animate-pulse' : 'warning' :
-                    ''}`}
+                  className={`font-bold ${timeRemaining.minutes <= 5 ?
+                    timeRemaining.minutes <= 1 ? 'text-red-600 animate-pulse' : 'text-amber-600' :
+                    'text-blue-600'}`}
                 >
-                  <Clock className="h-3.5 w-3.5 mr-1" />
                   {timeRemaining.minutes}:{timeRemaining.seconds < 10 ? '0' : ''}{timeRemaining.seconds}
                 </span>
                 <span className="ml-1 text-gray-600 text-sm">MIN</span>
               </div>
               <Button
-                className="px-3 py-1.5 bg-[#48A6A7] text-white rounded-lg hover:bg-[#006A71] transition-all duration-200 shadow-sm hover:shadow-md text-sm"
+                className="px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm"
                 onClick={handleSubmitTest}
               >
-                Submit Test
+                Submit
               </Button>
             </div>
             <h1 className="test-title text-lg font-bold truncate w-full">{test?.title}</h1>
@@ -1189,11 +1179,10 @@ const TakeTest = () => {
                 <div className="flex items-center">
                   <span
                     id="timer"
-                    className={`font-bold timer ${timeRemaining.minutes <= 5 ?
-                      timeRemaining.minutes <= 1 ? 'danger animate-pulse' : 'warning' :
-                      ''}`}
+                    className={`font-bold ${timeRemaining.minutes <= 5 ?
+                      timeRemaining.minutes <= 1 ? 'text-red-600 animate-pulse' : 'text-amber-600' :
+                      'text-blue-600'}`}
                   >
-                    <Clock className="h-4 w-4 mr-1" />
                     {timeRemaining.minutes}:{timeRemaining.seconds < 10 ? '0' : ''}{timeRemaining.seconds}
                   </span>
                   <span className="ml-1 text-gray-600">MIN</span>
@@ -1205,10 +1194,10 @@ const TakeTest = () => {
                 )}
               </div>
               <Button
-                className="px-4 py-2 bg-[#48A6A7] text-white rounded-lg hover:bg-[#006A71] transition-all duration-200 shadow-sm hover:shadow-md"
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
                 onClick={handleSubmitTest}
               >
-                Submit Test
+                Submit
               </Button>
             </div>
           </div>
@@ -1265,14 +1254,14 @@ const TakeTest = () => {
 
         <section id="question-container" className="mb-6">
           {/* Question number display */}
-          <div className="question-number-display mt-2 mb-2 font-bold p-2 px-3 rounded-md w-full shadow-sm">
+          <div className="question-number-display mt-2 mb-2 font-bold bg-blue-100 p-2 px-3 rounded-md w-full shadow-sm border-l-4 border-blue-500">
             <div className="flex items-center justify-between relative z-10">
               <div>
                 <span className="text-blue-700">Question {currentQuestion}</span>
                 <span className="text-gray-500 text-sm ml-2">of {filteredQuestions.length}</span>
               </div>
               {currentQuestionData && (
-                <div className="ml-4 bg-[#F2EFE7] px-2 py-0.5 rounded text-sm flex items-center shadow-sm border border-[#9ACBD0]">
+                <div className="ml-4 bg-white px-2 py-0.5 rounded text-sm flex items-center shadow-sm">
                   <span className="text-green-600 font-medium">+{currentQuestionData.marks || 4}</span>
                   <span className="mx-1">/</span>
                   <span className="text-red-600 font-medium">-{currentQuestionData.negativeMarks || 1}</span>
@@ -1287,7 +1276,7 @@ const TakeTest = () => {
           </div>
 
           {/* Question text container with scrolling */}
-          <div id="question" className="mt-2 max-h-[200px] overflow-y-auto overflow-x-hidden p-3 relative scrollable-container bg-white">
+          <div id="question" className="mt-2 max-h-[200px] overflow-y-auto overflow-x-hidden p-3 border border-gray-100 rounded-lg relative scrollable-container bg-white">
             <div className="scroll-indicator"></div>
             <div className="question-text whitespace-pre-wrap break-words">
               {currentQuestionData?.text || "Question will appear here..."}
@@ -1296,7 +1285,7 @@ const TakeTest = () => {
 
           {/* Question image container without scrolling */}
           {currentQuestionData?.imageUrl && (
-            <div className="mt-4 p-4 border border-[#9ACBD0] rounded-lg bg-[#F2EFE7]">
+            <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-white">
               <img
                 src={currentQuestionData.imageUrl}
                 alt="Question image"
@@ -1318,15 +1307,7 @@ const TakeTest = () => {
                   <div
                     className={`option-container scrollable-container ${(tempSelectedOption === optionLetter || (!tempSelectedOption && selectedOptions[currentQuestionIndex] === optionLetter)) ? 'selected' : ''}`}
                     data-option={optionLetter}
-                    onClick={() => {
-                      handleOptionSelect(optionLetter);
-                      // Show a subtle toast when an option is selected
-                      toast.info(`Option ${optionLetter} selected`, {
-                        duration: 1000,
-                        position: 'bottom-center',
-                        className: 'bg-blue-50 text-blue-800 border border-blue-200'
-                      });
-                    }}
+                    onClick={() => handleOptionSelect(optionLetter)}
                   >
                     <div className="scroll-indicator"></div>
                     <div className="option-letter mr-1 flex-shrink-0">
@@ -1340,7 +1321,7 @@ const TakeTest = () => {
                   {/* Option image container without scrolling */}
                   {option.imageUrl && (
                     <div
-                      className={`mt-1 p-3 border border-[#9ACBD0] rounded-lg bg-[#F2EFE7] ${(tempSelectedOption === optionLetter || (!tempSelectedOption && selectedOptions[currentQuestionIndex] === optionLetter)) ? 'option-image-selected' : ''}`}
+                      className={`mt-1 p-3 border border-gray-200 rounded-lg bg-white ${(tempSelectedOption === optionLetter || (!tempSelectedOption && selectedOptions[currentQuestionIndex] === optionLetter)) ? 'option-image-selected' : ''}`}
                       onClick={() => handleOptionSelect(optionLetter)}
                     >
                       <img
@@ -1434,11 +1415,11 @@ const TakeTest = () => {
 
 
         <div className="status-legend">
-          <div><div className="color-box" style={{backgroundColor: '#F2EFE7', border: '1px solid #9ACBD0'}}></div>Not Visited <span className="font-semibold ml-auto">{counters["not-visited"]}</span></div>
-          <div><div className="color-box" style={{backgroundColor: 'white', border: '1px solid #9ACBD0'}}></div>Un-answered <span className="font-semibold ml-auto">{counters["unanswered"]}</span></div>
-          <div><div className="color-box" style={{backgroundColor: '#9ACBD0', border: '1px solid #48A6A7'}}></div>Answered <span className="font-semibold ml-auto">{counters["answered"]}</span></div>
-          <div><div className="color-box" style={{backgroundColor: '#E8F4F5', border: '1px solid #48A6A7'}}></div>Review <span className="font-semibold ml-auto">{counters["review"]}</span></div>
-          <div><div className="color-box" style={{backgroundColor: '#48A6A7', border: '1px solid #006A71'}}></div>Review with Answer <span className="font-semibold ml-auto">{counters["review-with-answer"]}</span></div>
+          <div><div className="color-box bg-gray-300"></div>Not Visited <span className="font-semibold ml-auto">{counters["not-visited"]}</span></div>
+          <div><div className="color-box bg-red-400"></div>Un-answered <span className="font-semibold ml-auto">{counters["unanswered"]}</span></div>
+          <div><div className="color-box bg-green-400"></div>Answered <span className="font-semibold ml-auto">{counters["answered"]}</span></div>
+          <div><div className="color-box bg-yellow-400"></div>Review <span className="font-semibold ml-auto">{counters["review"]}</span></div>
+          <div><div className="color-box bg-purple-400"></div>Review with Answer <span className="font-semibold ml-auto">{counters["review-with-answer"]}</span></div>
         </div>
       </div>
 
@@ -1451,23 +1432,21 @@ const TakeTest = () => {
               <button
                 id="fixed-clear-btn"
                 className="fixed-nav-button"
-                onClick={() => {
-                  handleClearSelection();
-                  toast.success("Option cleared");
+                onClick={handleClearSelection}
+                style={{
+                  backgroundColor: '#4b5563'
                 }}
               >
-                <Trash2 className="h-3.5 w-3.5 mr-1" />
                 <span className="fixed-nav-button-text">Clear Option</span>
               </button>
               <button
                 id="fixed-mark-btn"
                 className="fixed-nav-button"
-                onClick={() => {
-                  handleMarkReview();
-                  toast.success("Marked for review");
+                onClick={handleMarkReview}
+                style={{
+                  backgroundColor: '#4b5563'
                 }}
               >
-                <Flag className="h-3.5 w-3.5 mr-1" />
                 <span className="fixed-nav-button-text">Mark Review</span>
               </button>
             </div>
@@ -1479,22 +1458,23 @@ const TakeTest = () => {
                 className="fixed-nav-button"
                 onClick={handlePrevQuestion}
                 disabled={currentQuestion === 1}
+                style={{
+                  backgroundColor: currentQuestion === 1 ? '#d4ddf7' : '#3664ef',
+                  opacity: currentQuestion === 1 ? 0.7 : 1
+                }}
               >
-                <ArrowLeft className="h-3.5 w-3.5 mr-1" />
                 <span className="fixed-nav-button-text">Previous</span>
               </button>
               <button
                 id="fixed-next-btn"
                 className="fixed-nav-button"
-                onClick={() => {
-                  handleNextQuestion();
-                  if (selectedOptions[currentQuestion - 1]) {
-                    toast.success("Answer saved");
-                  }
+                onClick={handleNextQuestion}
+                style={{
+                  backgroundColor: '#3664ef',
+                  opacity: 1
                 }}
               >
                 <span className="fixed-nav-button-text">Save & Next</span>
-                <ArrowRight className="h-3.5 w-3.5 ml-1" />
               </button>
             </div>
           </div>
@@ -1518,7 +1498,7 @@ const TakeTest = () => {
                 setSubject(availableSubjects[0]);
                 setCurrentQuestion(1);
               }}
-              className="bg-[#48A6A7] text-white hover:bg-[#006A71]"
+              className="bg-blue-500 text-white hover:bg-blue-600"
             >
               Yes
             </Button>
@@ -1653,7 +1633,7 @@ const TakeTest = () => {
             top: 0;
             width: 4px;
             height: 100%;
-            background: linear-gradient(to bottom, #48A6A7, #9ACBD0);
+            background: linear-gradient(to bottom, #3b82f6, #60a5fa);
             opacity: 0;
             transition: opacity 0.3s ease;
             border-radius: 0 4px 4px 0;
@@ -1669,19 +1649,19 @@ const TakeTest = () => {
             display: none;
         }
         .option-container:hover {
-            background-color: rgba(154, 203, 208, 0.15) !important;
+            background-color: #f3f4f6;
         }
         .selected {
-            background-color: rgba(154, 203, 208, 0.3) !important;
-            border-color: #48A6A7 !important;
-            box-shadow: 0 1px 3px rgba(72, 166, 167, 0.3) !important;
+            background-color: #e0edff;
+            border-color: #3b82f6;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         /* Style for option image container when selected */
         .option-image-selected {
-            border-color: #48A6A7 !important;
-            background-color: rgba(154, 203, 208, 0.3) !important;
-            box-shadow: 0 0 0 2px rgba(72, 166, 167, 0.3) !important;
+            border-color: #3b82f6 !important;
+            background-color: rgba(59, 130, 246, 0.05);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
         }
         .timer {
             font-size: 0.9rem;
@@ -1765,7 +1745,7 @@ const TakeTest = () => {
             top: 0;
             width: 4px;
             height: 100%;
-            background: linear-gradient(to bottom, #48A6A7, #9ACBD0);
+            background: linear-gradient(to bottom, #3b82f6, #60a5fa);
             opacity: 0.7;
         }
         .question-status {
@@ -1794,30 +1774,25 @@ const TakeTest = () => {
         }
 
         .question-status.current {
-            border-color: #48A6A7 !important;
-            box-shadow: 0 0 0 3px rgba(72, 166, 167, 0.4);
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
             transform: scale(1.05);
             z-index: 3;
         }
         .question-status.not-visited {
-            background-color: #F2EFE7;
-            border: 1px solid #9ACBD0;
+            background-color: #e2e8f0;
         }
         .question-status.unanswered {
-            background-color: white;
-            border: 1px solid #9ACBD0;
+            background-color: #f87171;
         }
         .question-status.answered {
-            background-color: #9ACBD0;
-            border: 1px solid #48A6A7;
+            background-color: #4ade80;
         }
         .question-status.review {
-            background-color: #E8F4F5;
-            border: 1px solid #48A6A7;
+            background-color: #fbbf24;
         }
         .question-status.review-with-answer {
-            background-color: #48A6A7;
-            border: 1px solid #006A71;
+            background-color: #a78bfa;
         }
         .main-content {
             margin-right: 320px;
@@ -1835,7 +1810,7 @@ const TakeTest = () => {
         .question-number-display {
             position: relative;
             transition: all 0.3s ease;
-            background: linear-gradient(to right, #9ACBD0, #F2EFE7);
+            background: linear-gradient(to right, #e6f0ff, #f0f7ff);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             border-radius: 8px;
         }
